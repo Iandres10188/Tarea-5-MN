@@ -1,0 +1,793 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "1755130b-b360-4067-9ff1-a86fdc0d06fa",
+   "metadata": {},
+   "source": [
+    "# Escuela Politécnica nacional\n",
+    "## Tarea N°5\n",
+    "## Erick Carcelén"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b50441df-4a3e-4f0b-a6e2-b3c3c7aef34a",
+   "metadata": {},
+   "source": [
+    "#### 1. Sea $f(x)=-x^3-cosx\\ \\ y\\ \\ p_0=-1$. Utilice el método de Newton y de la Secante para encontrar $p_2$. ¿Se podría usar $p_0=0$?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "3f0ec078-1b7d-481e-8d53-89dfff5dd707",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "\n",
+    "def newton_method(f, df, p0, tol=1e-6, max_iter=100):\n",
+    "    for i in range(max_iter):\n",
+    "        p = p0 - f(p0)/df(p0)\n",
+    "        if abs(p - p0) < tol:\n",
+    "            return p, i + 1\n",
+    "        p0 = p\n",
+    "    return p, max_iter"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "02c0423c-f190-4ad1-831e-298b5888a71d",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Método de Newton: p2 = -0.8654740331016162, iteraciones = 4\n"
+     ]
+    }
+   ],
+   "source": [
+    "f1 = lambda x: -x**3 - np.cos(x)\n",
+    "df1 = lambda x: -3*x**2 + np.sin(x)\n",
+    "\n",
+    "p0_newton = -1\n",
+    "p2_newton, iterations_newton = newton_method(f1, df1, p0_newton)\n",
+    "print(f\"Método de Newton: p2 = {p2_newton}, iteraciones = {iterations_newton}\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "81af9de5-27cb-4fa8-a2aa-35e45aa58df3",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def secant_method(f, p0, p1, tol=1e-6, max_iter=100):\n",
+    "    for i in range(max_iter):\n",
+    "        q0, q1 = f(p0), f(p1)\n",
+    "        p = p1 - q1 * (p1 - p0) / (q1 - q0)\n",
+    "        if abs(p - p1) < tol:\n",
+    "            return p, i + 1\n",
+    "        p0, p1 = p1, p\n",
+    "    return p, max_iter"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "58a013d1-3465-469a-81da-27cbdc14037a",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Método de la secenate: p2 = -0.8654740330997166, iteraciones = 6\n"
+     ]
+    }
+   ],
+   "source": [
+    "p0_secant, p1_secant = -1, -0.5\n",
+    "p2_secant, iterations_secant = secant_method(f1, p0_secant, p1_secant)\n",
+    "print(f\"Método de la secenate: p2 = {p2_secant}, iteraciones = {iterations_secant}\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "a5d7383a-8d24-4d18-88ad-54097c9dc10d",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "f(0) = -1.0\n",
+      "f'(0) = 0.0\n",
+      "Métodod de Newton: p2 = nan, iteraciones = 100\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "C:\\Users\\Erick\\AppData\\Local\\Temp\\ipykernel_7580\\2482269434.py:5: RuntimeWarning: divide by zero encountered in scalar divide\n",
+      "  p = p0 - f(p0)/df(p0)\n",
+      "C:\\Users\\Erick\\AppData\\Local\\Temp\\ipykernel_7580\\1908360107.py:1: RuntimeWarning: invalid value encountered in cos\n",
+      "  f1 = lambda x: -x**3 - np.cos(x)\n",
+      "C:\\Users\\Erick\\AppData\\Local\\Temp\\ipykernel_7580\\1908360107.py:2: RuntimeWarning: invalid value encountered in sin\n",
+      "  df1 = lambda x: -3*x**2 + np.sin(x)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Evaluamos la función y su derivada en x = 0\n",
+    "f_at_0 = f1(0)\n",
+    "df_at_0 = df1(0)\n",
+    "\n",
+    "print(f\"f(0) = {f_at_0}\")\n",
+    "print(f\"f'(0) = {df_at_0}\")\n",
+    "\n",
+    "# Intentamos aplicar el Método de Newton desde p0 = 0\n",
+    "try:\n",
+    "    p0_newton = 0\n",
+    "    p2_newton, iterations_newton = newton_method(f1, df1, p0_newton)\n",
+    "    print(f\"Métodod de Newton: p2 = {p2_newton}, iteraciones = {iterations_newton}\")\n",
+    "except ZeroDivisionError:\n",
+    "    print(\"No es posible ejecutar el método debido a una división por 0 en p0 = 0.\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8aaca276-793e-4b27-856e-c0883a15dde1",
+   "metadata": {},
+   "source": [
+    "El resultado obetnido confirma que no se puede usar $p_0=0$ en el método de Newton debido a la división por cero en la derivada"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "954ec36b-cfae-4d4b-9631-5dcc47c7d72f",
+   "metadata": {},
+   "source": [
+    "#### 2. Encuentre soluciones precisas dentro de $10^{-4}$ para los siguientes problemas:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "40eb14cf-6029-41fa-912b-1e4bde31afd2",
+   "metadata": {},
+   "source": [
+    "a. $x^3-2x^2-5=0,\\  [1,4]$"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "8f2d744e-9ee4-4490-b726-ee9e4e0d1b39",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Métodod de Newton (a): raíz = 2.6906474480286287, iteraciones = 22\n",
+      "Método de la Secante (a): raíz = 2.690647447883773, iteraciones = 10\n"
+     ]
+    }
+   ],
+   "source": [
+    "f2a = lambda x: x**3 - 2*x**2 - 5\n",
+    "df2a = lambda x: 3*x**2 - 4*x\n",
+    "\n",
+    "p0_newton_a = 1\n",
+    "root_newton_a, iterations_newton_a = newton_method(f2a, df2a, p0_newton_a, tol=1e-4)\n",
+    "print(f\"Métodod de Newton (a): raíz = {root_newton_a}, iteraciones = {iterations_newton_a}\")\n",
+    "\n",
+    "p0_secant_a, p1_secant_a = 1, 4\n",
+    "root_secant_a, iterations_secant_a = secant_method(f2a, p0_secant_a, p1_secant_a, tol=1e-4)\n",
+    "print(f\"Método de la Secante (a): raíz = {root_secant_a}, iteraciones = {iterations_secant_a}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3e9b560f-1a1a-4430-a2e7-4013a7c1d79d",
+   "metadata": {},
+   "source": [
+    "b. $\\ x^3+3x^2-1=0,\\  [-3,-2]$"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "id": "3f5f9bdb-24d0-404d-a3ad-c1e8375321cb",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Método de Newton (b): raíz = -2.8793852448366706, iteraciones = 3\n",
+      "Método de la Secante (b): raíz = -2.879385194736809, iteraciones = 6\n"
+     ]
+    }
+   ],
+   "source": [
+    "f2b = lambda x: x**3 + 3*x**2 - 1\n",
+    "df2b = lambda x: 3*x**2 + 6*x\n",
+    "\n",
+    "p0_newton_b = -3\n",
+    "root_newton_b, iterations_newton_b = newton_method(f2b, df2b, p0_newton_b, tol=1e-4)\n",
+    "print(f\"Método de Newton (b): raíz = {root_newton_b}, iteraciones = {iterations_newton_b}\")\n",
+    "\n",
+    "p0_secant_b, p1_secant_b = -3, -2\n",
+    "root_secant_b, iterations_secant_b = secant_method(f2b, p0_secant_b, p1_secant_b, tol=1e-4)\n",
+    "print(f\"Método de la Secante (b): raíz = {root_secant_b}, iteraciones = {iterations_secant_b}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "558eb031-df88-476a-a03f-9823abd924c4",
+   "metadata": {},
+   "source": [
+    "c. $x-cosx=0,\\  [0,\\pi/2]$"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "271ef645-4457-4d0d-908d-b95b0e795bfa",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Método de Newton (c): raíz = 0.739085133385284, iteraciones = 4\n",
+      "Método de la Secante (c): raíz = 0.739085133034638, iteraciones = 5\n"
+     ]
+    }
+   ],
+   "source": [
+    "f2c = lambda x: x - np.cos(x)\n",
+    "df2c = lambda x: 1 + np.sin(x)\n",
+    "\n",
+    "p0_newton_c = 0\n",
+    "root_newton_c, iterations_newton_c = newton_method(f2c, df2c, p0_newton_c, tol=1e-4)\n",
+    "print(f\"Método de Newton (c): raíz = {root_newton_c}, iteraciones = {iterations_newton_c}\")\n",
+    "\n",
+    "p0_secant_c, p1_secant_c = 0, np.pi/2\n",
+    "root_secant_c, iterations_secant_c = secant_method(f2c, p0_secant_c, p1_secant_c, tol=1e-4)\n",
+    "print(f\"Método de la Secante (c): raíz = {root_secant_c}, iteraciones = {iterations_secant_c}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7f8dc902-d0fb-4c98-9057-434f2388d385",
+   "metadata": {},
+   "source": [
+    "d. $x-0.8-0.2senx=0,\\  [0,\\pi/2]$"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "id": "720223c2-2afb-4b5b-bba3-e6b2f85eabf7",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Método de Newton (d): raíz = 0.9643338876952227, iteraciones = 4\n",
+      "Método de la Secante (d): raíz = 0.964333884548886, iteraciones = 4\n"
+     ]
+    }
+   ],
+   "source": [
+    "f2d = lambda x: x - 0.8 - 0.2 * np.sin(x)\n",
+    "df2d = lambda x: 1 - 0.2 * np.cos(x)\n",
+    "\n",
+    "p0_newton_d = 0\n",
+    "root_newton_d, iterations_newton_d = newton_method(f2d, df2d, p0_newton_d, tol=1e-4)\n",
+    "print(f\"Método de Newton (d): raíz = {root_newton_d}, iteraciones = {iterations_newton_d}\")\n",
+    "\n",
+    "p0_secant_d, p1_secant_d = 0, np.pi/2\n",
+    "root_secant_d, iterations_secant_d = secant_method(f2d, p0_secant_d, p1_secant_d, tol=1e-4)\n",
+    "print(f\"Método de la Secante (d): raíz = {root_secant_d}, iteraciones = {iterations_secant_d}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "55e5be3b-ae0d-4b57-97ec-8b55471cf7a9",
+   "metadata": {},
+   "source": [
+    "#### 3. Use los 2 métodos en esta sección para encontrar las soluciones dentro de $10^{-5}$ para los siguientes problemas:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "653e47cd-c212-4aca-9603-bf7ef3da2843",
+   "metadata": {},
+   "source": [
+    "a. $3x-e^{x}=0\\  $ para $\\  1\\leq x\\leq2$"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "1b07474a-fdab-43f2-a288-aba11a34fca4",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Método de Newton (3a): raíz = 0.6190612867359452, iteraciones = 6\n",
+      "Método de la Secante (3a): raíz = 1.5121345517620621, iteraciones = 9\n"
+     ]
+    }
+   ],
+   "source": [
+    "f3a = lambda x: 3*x - np.exp(x)\n",
+    "df3a = lambda x: 3 - np.exp(x)\n",
+    "\n",
+    "p0_newton_3a = 1\n",
+    "root_newton_3a, iterations_newton_3a = newton_method(f3a, df3a, p0_newton_3a, tol=1e-5)\n",
+    "print(f\"Método de Newton (3a): raíz = {root_newton_3a}, iteraciones = {iterations_newton_3a}\")\n",
+    "\n",
+    "p0_secant_3a, p1_secant_3a = 1, 2\n",
+    "root_secant_3a, iterations_secant_3a = secant_method(f3a, p0_secant_3a, p1_secant_3a, tol=1e-5)\n",
+    "print(f\"Método de la Secante (3a): raíz = {root_secant_3a}, iteraciones = {iterations_secant_3a}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a0185a8b-51db-4ebe-8ac1-6121a4a86ab9",
+   "metadata": {},
+   "source": [
+    "b. $2+3cosx-e^{x}=0\\  $ para $\\  1\\leq x \\leq 2$"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "id": "055433e3-09ae-46b2-bcdf-23a40cfae2b9",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Método de Newton (3b): raíz = 1.2397146979752596, iteraciones = 4\n",
+      "Método de la Secante (3b): raíz = 1.2397146979752531, iteraciones = 6\n"
+     ]
+    }
+   ],
+   "source": [
+    "f3b = lambda x: 2*x + 3*np.cos(x) - np.exp(x)\n",
+    "df3b = lambda x: 2 - 3*np.sin(x) - np.exp(x)\n",
+    "\n",
+    "p0_newton_3b = 1\n",
+    "root_newton_3b, iterations_newton_3b = newton_method(f3b, df3b, p0_newton_3b, tol=1e-5)\n",
+    "print(f\"Método de Newton (3b): raíz = {root_newton_3b}, iteraciones = {iterations_newton_3b}\")\n",
+    "\n",
+    "p0_secant_3b, p1_secant_3b = 1, 2\n",
+    "root_secant_3b, iterations_secant_3b = secant_method(f3b, p0_secant_3b, p1_secant_3b, tol=1e-5)\n",
+    "print(f\"Método de la Secante (3b): raíz = {root_secant_3b}, iteraciones = {iterations_secant_3b}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ad6f1025-3da7-496d-a321-732139d2c7b4",
+   "metadata": {},
+   "source": [
+    "#### 4. El polinomio de cuarto grado: $$f(x) = 230x^4 + 18x^3 + 9x^2 - 221x - 9$$ tiene dos ceros reales, uno en $\\  [1,0]\\  $ y el otro en $\\  [0, ]\\ $. Intente aproximar estos ceros dentro de $10^{-6}\\ $ con:\n",
+    "#### a. El método de la Secante (use los extremos como las estimaciones iniciales)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "id": "3f1cd6ab-fb90-411b-9108-2e0c47eb2da5",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Método de la Secante (4a): raíz = -0.040659288315725135, iteraciones = 4\n",
+      "Método de la Secante (4b): raíz = -0.04065928831557162, iteraciones = 11\n"
+     ]
+    }
+   ],
+   "source": [
+    "f4 = lambda x: 230*x**4 + 18*x**3 + 9*x**2 - 221*x - 9\n",
+    "\n",
+    "p0_secant_4a, p1_secant_4a = -1, 0\n",
+    "root_secant_4a, iterations_secant_4a = secant_method(f4, p0_secant_4a, p1_secant_4a, tol=1e-6)\n",
+    "print(f\"Método de la Secante (4a): raíz = {root_secant_4a}, iteraciones = {iterations_secant_4a}\")\n",
+    "\n",
+    "p0_secant_4b, p1_secant_4b = 0, 1\n",
+    "root_secant_4b, iterations_secant_4b = secant_method(f4, p0_secant_4b, p1_secant_4b, tol=1e-6)\n",
+    "print(f\"Método de la Secante (4b): raíz = {root_secant_4b}, iteraciones = {iterations_secant_4b}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "cf3c9628-ede0-4daf-b4ab-25938ffaca44",
+   "metadata": {},
+   "source": [
+    "#### b. El método de Newton (use el punto medio como estimación inicial)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "id": "ab1d6bb1-1ff0-48ee-8e40-3026dfd65800",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Método de Newton (4a): raíz = -0.04065928831575899, iteraciones = 4\n",
+      "Método de Newton (4b): raíz = -0.040659288315758865, iteraciones = 6\n"
+     ]
+    }
+   ],
+   "source": [
+    "df4 = lambda x: 920*x**3 + 54*x**2 + 18*x - 221\n",
+    "\n",
+    "p0_newton_4a = -0.5\n",
+    "root_newton_4a, iterations_newton_4a = newton_method(f4, df4, p0_newton_4a, tol=1e-6)\n",
+    "print(f\"Método de Newton (4a): raíz = {root_newton_4a}, iteraciones = {iterations_newton_4a}\")\n",
+    "\n",
+    "p0_newton_4b = 0.5\n",
+    "root_newton_4b, iterations_newton_4b = newton_method(f4, df4, p0_newton_4b, tol=1e-6)\n",
+    "print(f\"Método de Newton (4b): raíz = {root_newton_4b}, iteraciones = {iterations_newton_4b}\")\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "84f7953f-eba8-4d5c-84b1-70be818ba9d3",
+   "metadata": {},
+   "source": [
+    "#### 5. La función $\\ f(x)=tan\\pi x-6$ tiene cero en $(1/\\pi)\\ $arcotangente $6 \\approx 0.447431543$. Sea $p_0=0\\  y\\  p_1=0.48\\ $ y use 10 iteraciones en cada uno de los siguientes métodos para aproximar esta raíz. ¿Cuál método es más eficaz y por qué?\n",
+    "#### a. Método de Bisección"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 35,
+   "id": "647cbdda-ac20-463a-9275-1cdfba7a9c4a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "\n",
+    "# Función f(x)\n",
+    "f5 = lambda x: np.tan(np.pi * x) - 6\n",
+    "\n",
+    "# Derivada f'(x)\n",
+    "df5 = lambda x: np.pi / (np.cos(np.pi * x))**2"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 36,
+   "id": "1fe64175-6641-4d50-96bc-5f911ae53344",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Método de la bisección: raíz = 0.44765625, iteraciones = 10\n"
+     ]
+    }
+   ],
+   "source": [
+    "def bisection_method(f, a, b, tol=1e-6, max_iter=10):\n",
+    "    if f(a) * f(b) > 0:\n",
+    "        raise ValueError(\"f(a) and f(b) must have opposite signs\")\n",
+    "    for i in range(max_iter):\n",
+    "        c = (a + b) / 2\n",
+    "        if abs(f(c)) < tol or (b - a) / 2 < tol:\n",
+    "            return c, i + 1\n",
+    "        if f(c) * f(a) > 0:\n",
+    "            a = c\n",
+    "        else:\n",
+    "            b = c\n",
+    "    return c, max_iter\n",
+    "\n",
+    "a, b = 0, 0.48\n",
+    "root_bisection, iterations_bisection = bisection_method(f5, a, b, tol=1e-6, max_iter=10)\n",
+    "print(f\"Método de la bisección: raíz = {root_bisection}, iteraciones = {iterations_bisection}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a1e92f58-2e15-4278-b347-fc2d5db960ce",
+   "metadata": {},
+   "source": [
+    "#### b. Método de Newton"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 41,
+   "id": "5cc2cc6a-8879-4496-ae68-24b5909c0b6c",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Método de Newton: raíz = 13.655012218663435, iteraciones = 10\n"
+     ]
+    }
+   ],
+   "source": [
+    "p0_newton_5 = 0\n",
+    "root_newton, iterations_newton = newton_method(f5, df5, p0_newton_5, tol=1e-6, max_iter=10)\n",
+    "print(f\"Método de Newton: raíz = {root_newton}, iteraciones = {iterations_newton}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "96107957-9b1c-4795-9709-e84298c519c8",
+   "metadata": {},
+   "source": [
+    "#### c. Método de la Secante"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 43,
+   "id": "fe033bdd-2745-4dc6-8b7b-cf09c51521f5",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Método de la Secante: raíz = -2989.9400375314453, iteracions = 10\n"
+     ]
+    }
+   ],
+   "source": [
+    "p0_secant_5, p1_secant_5 = 0, 0.48\n",
+    "root_secant_5, iterations_secant_5 = secant_method(f5, p0_secant_5, p1_secant_5, tol=1e-6, max_iter=10)\n",
+    "print(f\"Método de la Secante: raíz = {root_secant_5}, iteracions = {iterations_secant_5}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "c8226397-f9c3-4ed5-83c0-df84a321b9e0",
+   "metadata": {},
+   "source": [
+    "El método de la bisección ha encontrado una raíz cercana a 0.44765625 después de 10 iteraciones, lo cual es bastante preciso considerando la raíz verdadera aproximada 0.447431543.\n",
+    "\n",
+    "El método de Newton parece diverger, resultando en una raíz no razonable 13.655012218663435. Esto puede suceder si el punto inicial está demasiado lejos de la raíz o si la derivada en algún punto es muy grande o cero.\n",
+    "\n",
+    "El método de la secante también parece diverger, resultando en una raíz no razonable −2989.9400375314453. Esto puede suceder si las iteraciones iniciales están lejos de la raíz y la función cambia rápidamente."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "cdc54275-17e1-48fd-a1ce-e77a7718dfe9",
+   "metadata": {},
+   "source": [
+    "#### 6. La función descrita por $\\  f(x)=ln(x^2+1)-e^{0.4x}cos\\pi x\\  $ tiene un número infinito de ceros.\n",
+    "#### a. Determine, dentro de $\\ 10^{-6},\\ $ el único cero negativo."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a40eb261-8725-4486-b74a-f333295f9e04",
+   "metadata": {},
+   "source": [
+    "#### b. Determinar, dentro de $\\ 10^{-6},\\ $ los cuatro ceros positivos más pequeños"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b8e7d6ef-9316-4d0a-a0c6-aaedb142f141",
+   "metadata": {},
+   "source": [
+    "#### c. Determinar una aproximación inicial razonable para encontrar el enésimo cero positivo más pequeño de $f$.\n",
+    "#### \\[Sugerencia: Dibuje una gráfica aproximada de $f$.] "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2408458a-aac1-445d-a84c-92b7fbab21e0",
+   "metadata": {},
+   "source": [
+    "#### d. Use la parte c) para determinar, dentro de $10^{−6}$, el vigesimoquinto cero positivo más pequeño de $f$. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 46,
+   "id": "608565b4-af98-4272-949e-f6ea57e29402",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "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6kx1dTUMBoPHr3cmuX86na7DxwcNGoQLL7wQX331FX71q191Oi0pP78732eicMDAhyjMqdVqXHTRRVi7di1KS0vdfqEOHz4cAFBYWNjhczsqQN63bx927tyJf/zjH5g3b57r+uHDh7vdR3n/n1OnTiE7O7vDNvv27cPu3bvxzjvvYP78+a7rR48e9eprJCUloaysrN31M68lJycDAF599VVMnjy5w3ulpaV59TU7um91dXWHQc3f/vY3fPXVVzjvvPPw2muv4cYbb8SkSZPatauurna7HxG541QXEeGRRx6BzWbDwoULz1oEfDZCCABoNw3Tk5VGubm5UKvVWL58eadt5CBMq9W6XX/jjTe8+hozZ87E/v37sXv3brfrK1eudPv8/PPPR3x8PA4cOIAJEyZ0+NGdPXSGDRsGwFGgfaa9e/fivvvuw2233YbvvvsOo0ePxo033oiampp2bQsKCgC0Bq1E5I4ZHyLC+eefj7/+9a+49957ce655+KXv/wlRowYAZVKhdLSUnz88ccA0G5aqyPnnHMOBgwYgEceeQRCCCQlJeHzzz/HunXrut2//v3749FHH8Uf//hHNDc34+abb0ZcXBwOHDiAyspKPPnkkxg2bBgGDhyIhx9+GEIIJCYm4osvvnBb7u3J4sWL8fe//x1z587FU089hbS0NPzrX//CwYMH3dpFR0fj1Vdfxfz581FdXY3rrrsOqampqKiowO7du1FRUeExQOvMpEmToNfrsXXrVrdpRaPRiBtuuAE5OTlYtmwZIiMj8eGHH+Lcc8/Fz3/+83Y7NW/duhVJSUkYNWpUl/tAFBYCWlpNRL3Krl27xM9//nORk5MjtFqt0Ol0YtCgQeK2224T//vf/9zazp8/XxgMhg7vc+DAATFr1iwRExMjEhISxPXXX+9a1fXEE0+42nm7qkv2j3/8Q0ycOFHodDoRHR0txo0bJ1asWNHlr9sZ+fk6nU4kJiaK22+/XfznP//pcAPDjRs3irlz54rExESh0WhEnz59xNy5c9uNpSPoYFWXEELMmzdPDB8+3O3a//t//09ERUWJ/fv3u13/6KOPBADx8ssvu67Z7XbRr18/ce+99561D0ThShLCmZcmIqKA2rFjByZOnIitW7d2WL9zNv/73/+Qm5uL/fv3u6bOiMgdAx8iol7kxhtvhNFoxJdfftnl586cOROD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4C83j+txMfrE/on48t4LcPe/fsTOEzW44x87cO9Fg7D4kiFd+n7VGM34+TvbUdNkweisODw29xwA3mfauuu+iwfj890lWH+oolsrvOpbLFjnXE14zbm+m+aSyRsZ5p+shRCiR9OAR531PYNSfVPfA7jX+PS0vzI54+Orqa4oDQOfgHrppZdw++2344477gAAvPLKK1izZg2WL1+OZ5991vsbGY2AuoPiSrUa0Onc23VGpQL0rW+S6pYWR/uO9iE/oy2amuBaLnImSQKiorrXtrkZsHt4czQYute2pQVoael8jGe2tXn4AYmKcvQbAEwmwOohfdqVtnq94/sMAGYzYGm//NhjW4ul4/HpdK3/Vs5237ZtLRZH+85otUBERNfbWq2O70VnIiNb+9+2bUfja9vWZnO8dmeQABgAGKI0jvZy2+amzvugadPWbnf8W/PQNiVGi19ckIP5k/vimx8L8eZ3BdhXXI83/7sXH393EHfPGITrxmcjUhfp+F4Ajp+JpjP60HaMen2nbY+VN+CBj/bgUFkD9ABunzEI988d1Tq94enn3ov3iDQ18P4to/DcmkN4+8fTePWbo9hzqg6vXD64880l27xH1BjNuPONb1FWUoeB8Tr87bpzoDO3wCKPr6kJiGszDaXge0ROsgHXjOuDj3aewl9X78Hfb5vQaduOfu7/s6UQqqYmjE41YEScuvX74817hDy+tmM5y8/9iIwYRKpVqDKaUVRai75xHrIeZ3mPKCqqgN7cgqExKsf3yNv3ky68R6Q4d1Y2We1oaGxGrKqT1w3w+j2ipbYearuttbi5u+8RnbSVi5tbms2efzY0mtb3a5vN83taF98jXG29IUKIyWQSarVafPLJJ27X77vvPjFt2rQOn9PS0iLq6upcH0VFRQKAqHP8aLX7sF16qTCbza4Pe1RUh+0EIGzTprnaGY1G0RIb23nb8ePd79uvX6dt7eec4972nHM6b9uvn1tb2/jxnbdNTnZvO21a522jotzbXnppp20F4N72mms8t62paW07b57ntsXFrrbWhQs9tz18uLXtkiWe2+bnt7Z9/HGPbS2bN7e2ffZZz23z8lrb/t//eW772Weutpa//c1z25UrW9uuXOm57d/+1tr2s888trX+3/+1ts3L89z22Wdb227e7Lnt44+3/pvIz/fcdsmS1raHD3tse+S6eaK5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0X4z8FGI2WzG9ddfj1/96lcdPm6z2TB37lwYjUZs2rQJq1atwscff4wHHnjA430XL16MTz/9FKtWrcKmTZvQ2NiIyy+/HDabzRfD8NrUqVNRWlrq9nHHHXegf//+mDBhgsfnzpkzx+15q1ev9lOvu+cPf/iDW38ff/xxj+2ff/55vPTSS3jttdewfft2pKenY9asWa5z4HqLgwcPwm6344033sD+/fvx8ssv4/XXX8ejjz561uf2xtfwgw8+wOLFi/HYY48hPz8fF154IS699FKcPHmyw/bHjx/HZZddhgsvvBD5+fl49NFHcd999+Hjjz/2c8+9s3HjRtxzzz3YunUr8vLyYLVakZubC6PReNbnHjp0yO31Gjx4sB963HUjRoxw6+fevXs7bRtsrx8AbN++3W18eXl5AIDrr7/e4/N66+tnNBoxZswYvPbaax0+3p33wi1btuDGG2/EvHnzsHv3bsybNw833HADtm3bplzHBSlqxYoVIi4urt311atXC5VKJYqLi13X3n//faHVakVdXV2H96qtrRUajUasWrXKda24uFioVCrx9ddfK973njCbzSI1NVX84Q9/8Nhu/vz54qqrrvJPpxTQr18/8fLLL3vd3m63i/T0dPGnP/3Jda2lpUXExcWJ119/3Qc9VNbzzz8vcnJyPLbpra/heeedJxYuXOh2bdiwYeLhhx/usP2DDz4ohg0b5nbtrrvuEpMnT/ZZH5VUXl4uAIiNGzd22mb9+vUCgKipqfFfx7rpiSeeEGPGjPG6fbC/fkIIcf/994uBAwcKu93e4ePB9PoBEJ9++qnr8+6+F95www1izpw5btdmz54tbrrpJsX6yoyPn2zZsgUjR45EZmam69rs2bNhMpmwc+fODp+zc+dOWCwW5Obmuq5lZmZi5MiR2Lx5s8/73BWff/45KisrsWDBgrO23bBhA1JTUzFkyBDceeedKC8v930He+C5555DUlISxo4di6efftrjVNDx48dRVlbm9ppptVpMnz69171mHamrq0NiYuJZ2/W219BsNmPnzp1u33cAyM3N7fT7vmXLlnbtZ8+ejR07dsBisfisr0qpq6sDAK9er3HjxiEjIwMXX3wx1q9f7+uudduRI0eQmZmJnJwc3HTTTSgoKOi0bbC/fmazGe+99x5+8YtfnPVA7GB5/drq7nthZ6+rku+fDHz8pKysDGlpaW7XEhISEBkZibKysk6fExkZiYSEBLfraWlpnT4nUN5++23Mnj0b2dnZHttdeuml+Ne//oVvvvkGL774IrZv346LLroIJpPJTz3tmvvvvx+rVq3C+vXrsWjRIrzyyiu4++67O20vvy5nvta98TU707Fjx/Dqq69i4cKFHtv1xtewsrISNputS9/3jn4m09LSYLVaUVlZ6bO+KkEIgSVLluCCCy7AyJEjO22XkZGBN998Ex9//DE++eQTDB06FBdffDG+/fZbP/bWO5MmTcI//vEPrFmzBm+99RbKysowdepUVFVVddg+mF8/APjss89QW1vr8T+LwfT6nam774Wdva5Kvn/ydHYPli5diieffNJjm+3bt5+1pkXWUVQvhDhrtK/Ec7zVnTGfOnUKa9aswYcffnjW+994442uv48cORITJkxAv3798NVXX+Gaa67pfse7oCtj/PWvf+26Nnr0aCQkJOC6665zZYE6c+br48vX7EzdeQ1LSkowZ84cXH/99bjjjjs8Prc3vIad6er3vaP2HV3vbRYtWoQ9e/Zg06ZNHtsNHToUQ4cOdX0+ZcoUFBUV4YUXXsC0adN83c0uufTSS11/HzVqFKZMmYKBAwfi3XffxZIlSzp8TrC+foDjP4uXXnqp2yzAmYLp9etMd94Lff3+ycDHg0WLFuGmm27y2KZ///5e3Ss9Pb1dcVZNTQ0sFku76Lbtc8xmM2pqatyyPuXl5Zg6dapXX7erujPmFStWICkpCVdeeWWXv15GRgb69euHI0eOdPm53dWT11VevXT06NEOAx95FUpZWRkyMjJc18vLyzt9nZXW1fGVlJRg5syZmDJlCt58880uf71AvIZnSk5Ohlqtbve/Qk/f9/T09A7bR0REeAxqA+3ee+/F559/jm+//RZZWVldfv7kyZPx3nvv+aBnyjIYDBg1alSn/66C9fUDgBMnTmDdunX45JNPuvzcYHn9uvte2NnrquT7JwMfD5KTk5GcnKzIvaZMmYKnn34apaWlrn8Ea9euhVarxfjx4zt8zvjx46HRaJCXl4cbbrgBAFBaWop9+/bh+eefV6RfZ+rqmIUQWLFiBW677TZoNJouf72qqioUFRW5/WD4Wk9e1/z8fADotL85OTlIT09HXl4exo0bB8Axl79x40Y899xz3etwF3VlfMXFxZg5cybGjx+PFStWQKXq+ux3IF7DM0VGRmL8+PHIy8vDz372M9f1vLw8XHXVVR0+Z8qUKfjiiy/crq1duxYTJkzo1r9lXxNC4N5778Wnn36KDRs2ICcnp1v3yc/PD+hr5S2TyYSffvoJF154YYePB9vr19aKFSuQmpqKuXPndvm5wfL6dfe9cMqUKcjLy3PLtq9du1bZ/+wrViYd5k6cOCHy8/PFk08+KaKjo0V+fr7Iz88XDQ0NQgghrFarGDlypLj44ovFjz/+KNatWyeysrLEokWLXPc4deqUGDp0qNi2bZvr2sKFC0VWVpZYt26d+PHHH8VFF10kxowZI6xWq9/H2JF169YJAOLAgQMdPj506FDxySefCCGEaGhoEA888IDYvHmzOH78uFi/fr2YMmWK6NOnj6ivr/dnt72yefNm8dJLL4n8/HxRUFAgPvjgA5GZmSmuvPJKt3ZtxyiEEH/6059EXFyc+OSTT8TevXvFzTffLDIyMnrdGIuLi8WgQYPERRddJE6dOiVKS0tdH20Fy2u4atUqodFoxNtvvy0OHDggFi9eLAwGgygsLBRCCPHwww+LefPmudoXFBSIqKgo8etf/1ocOHBAvP3220Kj0Yh///vfgRqCR7/61a9EXFyc2LBhg9tr1dTU5Gpz5hhffvll8emnn4rDhw+Lffv2iYcfflgAEB9//HEghuDRAw88IDZs2CAKCgrE1q1bxeWXXy5iYmJC5vWT2Ww20bdvX/HQQw+1eyzYXr+GhgbX7zoArvfLEydOCCG8ey+cN2+e28rL77//XqjVavGnP/1J/PTTT+JPf/qTiIiIEFu3blWs3wx8FDJ//nwBoN3H+vXrXW1OnDgh5s6dK/R6vUhMTBSLFi0SLS0trsePHz/e7jnNzc1i0aJFIjExUej1enH55ZeLkydP+nFknt18881i6tSpnT4OQKxYsUIIIURTU5PIzc0VKSkpQqPRiL59+4r58+f3qvG0tXPnTjFp0iQRFxcndDqdGDp0qHjiiSeE0Wh0a9d2jEI4lnE+8cQTIj09XWi1WjFt2jSxd+9eP/f+7FasWNHhv9kz/z8UTK/hX//6V9GvXz8RGRkpzj33XLel3vPnzxfTp093a79hwwYxbtw4ERkZKfr37y+WL1/u5x57r7PXqu2/vTPH+Nxzz4mBAwcKnU4nEhISxAUXXCC++uor/3feCzfeeKPIyMgQGo1GZGZmimuuuUbs37/f9Xiwv36yNWvWCADi0KFD7R4LttdPXm5/5sf8+fOFEN69F06fPt3VXvbRRx+JoUOHCo1GI4YNG6Z4oCcJ4awGIyIiIgpxXM5OREREYYOBDxEREYUNBj5EREQUNhj4EBERUdhg4ENERERhg4EPERERhQ0GPkRERBQ2GPgQERFR2GDgQ0RERGGDgQ8RERGFDQY+REREFDYY+BBRSKuoqEB6ejqeeeYZ17Vt27YhMjISa9euDWDPiCgQeEgpEYW81atX4+qrr8bmzZsxbNgwjBs3DnPnzsUrr7wS6K4RkZ8x8CGisHDPPfdg3bp1mDhxInbv3o3t27dDp9MFultE5GcMfIgoLDQ3N2PkyJEoKirCjh07MHr06EB3iYgCgDU+RBQWCgoKUFJSArvdjhMnTgS6O0QUIMz4EFHIM5vNOO+88zB27FgMGzYML730Evbu3Yu0tLRAd42I/IyBDxGFvN/+9rf497//jd27dyM6OhozZ85ETEwMvvzyy0B3jYj8jFNdRBTSNmzYgFdeeQX//Oc/ERsbC5VKhX/+85/YtGkTli9fHujuEZGfMeNDREREYYMZHyIiIgobDHyIiIgobDDwISIiorDBwIeIiIjCBgMfIiIiChsMfIiIiChsMPAhIiKisMHAh4iIiMIGAx8iIiIKGwx8iIiIKGww8CEiIqKw8f8BYIdJpgv3jNUAAAAASUVORK5CYII=",
+      "text/plain": [
+       "<Figure size 640x480 with 1 Axes>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "from scipy.optimize import newton, bisect\n",
+    "\n",
+    "# Definimos la función y su derivada\n",
+    "def f(x):\n",
+    "    return np.log(x**2 + 1) - np.exp(0.4*x) * np.cos(np.pi * x)\n",
+    "\n",
+    "def df(x):\n",
+    "    return (2*x / (x**2 + 1)) - 0.4*np.exp(0.4*x) * np.cos(np.pi * x) + np.pi*np.exp(0.4*x) * np.sin(np.pi * x)\n",
+    "\n",
+    "# Encontramos el único cero negativo\n",
+    "cero_negativo = newton(f, -1, fprime=df, tol=1e-6)\n",
+    "\n",
+    "# Encontramos los cuatro ceros positivos más pequeños\n",
+    "ceros_positivos = []\n",
+    "for i in range(1, 5):\n",
+    "    cero = newton(f, i, fprime=df, tol=1e-6)\n",
+    "    ceros_positivos.append(cero)\n",
+    "\n",
+    "# Aproximación inicial para el enésimo cero positivo más pequeño\n",
+    "def aproximacion_inicial(n):\n",
+    "    return n\n",
+    "\n",
+    "# Vigesimoquinto cero positivo más pequeño\n",
+    "vigesimoquinto_cero = newton(f, aproximacion_inicial(25), fprime=df, tol=1e-6)\n",
+    "\n",
+    "cero_negativo, ceros_positivos, vigesimoquinto_ceroimport matplotlib.pyplot as plt\n",
+    "\n",
+    "x = np.linspace(-10, 10, 1000)\n",
+    "y = f6(x)\n",
+    "\n",
+    "plt.plot(x, y)\n",
+    "plt.axhline(0, color='red', linestyle='--')\n",
+    "plt.title(\"Gráfica de f(x)\")\n",
+    "plt.xlabel(\"x\")\n",
+    "plt.ylabel(\"f(x)\")\n",
+    "plt.grid(True)\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 49,
+   "id": "cfe10ae1-24d7-42b1-bf9d-55f4e9cc10c3",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "(0.4506567478899403,\n",
+       " [-0.4341430472857333,\n",
+       "  0.4506567478899357,\n",
+       "  1.744738053368827,\n",
+       "  2.2383197950741383],\n",
+       " 22.49975528564899)"
+      ]
+     },
+     "execution_count": 49,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "from scipy.optimize import newton, bisect\n",
+    "\n",
+    "# Definimos la función y su derivada\n",
+    "def f(x):\n",
+    "    return np.log(x**2 + 1) - np.exp(0.4*x) * np.cos(np.pi * x)\n",
+    "\n",
+    "def df(x):\n",
+    "    return (2*x / (x**2 + 1)) - 0.4*np.exp(0.4*x) * np.cos(np.pi * x) + np.pi*np.exp(0.4*x) * np.sin(np.pi * x)\n",
+    "\n",
+    "# Encontramos el único cero negativo\n",
+    "cero_negativo = newton(f, -1, fprime=df, tol=1e-6)\n",
+    "\n",
+    "# Encontramos los cuatro ceros positivos más pequeños\n",
+    "ceros_positivos = []\n",
+    "for i in range(1, 5):\n",
+    "    cero = newton(f, i, fprime=df, tol=1e-6)\n",
+    "    ceros_positivos.append(cero)\n",
+    "\n",
+    "# Aproximación inicial para el enésimo cero positivo más pequeño\n",
+    "def aproximacion_inicial(n):\n",
+    "    return n\n",
+    "\n",
+    "# Vigesimoquinto cero positivo más pequeño\n",
+    "vigesimoquinto_cero = newton(f, aproximacion_inicial(25), fprime=df, tol=1e-6)\n",
+    "\n",
+    "cero_negativo, ceros_positivos, vigesimoquinto_cero"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "51ebaf7b-a2ce-4cfa-8bf6-2915634a4036",
+   "metadata": {},
+   "source": [
+    "#### 7. la función $\\ f(x)=x^{(1/3)}\\ $ tiene raíz en $x=0$. Usando el punto de inicio de $x=1\\ y\\ p_0=5,\\ p_1=0.5$ para el método de secante, compare los resultados de los métodos de la secante y de Newton."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 48,
+   "id": "77dbc8fa-2ae4-4185-bb80-aa5449e9004a",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Método de Newton (7): raíz = (5119.999999999987-1.2612400128951961e-11j), iteraciones = 10\n",
+      "Método de la Secante (7): raíz = (1.2916757952824988e+16+7.467594290408362e+16j), iteraciones = 100\n"
+     ]
+    }
+   ],
+   "source": [
+    "f7 = lambda x: x**(1/3)\n",
+    "df7 = lambda x: (1/3) * x**(-2/3)\n",
+    "\n",
+    "p0_newton_7 = 5\n",
+    "root_newton_7, iterations_newton_7 = newton_method(f7, df7, p0_newton_7, tol=1e-6)\n",
+    "print(f\"Método de Newton (7): raíz = {root_newton_7}, iteraciones = {iterations_newton_7}\")\n",
+    "\n",
+    "p0_secant_7, p1_secant_7 = 5, 0.5\n",
+    "root_secant_7, iterations_secant_7 = secant_method(f7, p0_secant_7, p1_secant_7, tol=1e-6)\n",
+    "print(f\"Método de la Secante (7): raíz = {root_secant_7}, iteraciones = {iterations_secant_7}\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "9d51a4f0-b1bb-45fb-bba3-6ee11e72f395",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
